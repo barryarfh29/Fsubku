@@ -1,3 +1,4 @@
+aiofiles
 aiohttp
 APScheduler
 https://github.com/hydrogram/hydrogram/archive/refs/heads/dev.zip
