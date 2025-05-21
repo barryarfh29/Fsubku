@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, List
+from os import environ
 
 from hydrogram import Client, filters
 from hydrogram.enums import ChatType
@@ -143,10 +144,15 @@ async def custom_start_handler_query(
         )
 
 
-@Client.on_callback_query(filter_authorized & filters.regex(r"add_(admin|f-sub)"))
+@Client.on_callback_query(filter_authorized & filters.regex(r"add_(admin|f-sub|channel-db)"))
 async def add_handler_query(client: "Bot", callback_query: "CallbackQuery") -> None:
     callback_query_data = callback_query.data.split("_")[1]
-    entity_data = "User ID" if callback_query_data == "admin" else "Chat ID"
+    channel_mode = callback_query_data.startswith("channel")
+    entity_data = (
+        "User ID" if callback_query_data == "admin"
+        else "Chat ID" if callback_query_data == "f-sub"
+        else "Stored Database Channel ID"
+    )
     await callback_query.message.edit_text(
         f"<blockquote><b>Send a {entity_data} to Add {callback_query_data.title()}!</b></blockquote>\n"
         "<pre language=Timeout>45 Seconds</pre>",
@@ -155,6 +161,8 @@ async def add_handler_query(client: "Bot", callback_query: "CallbackQuery") -> N
 
     chat_id, user_id = callback_query.message.chat.id, callback_query.from_user.id
     buttons = ikb(button.Back)
+    if channel_mode:
+        buttons = ikb([[("« Back to Profile", "profile")]])
 
     try:
         listening = await client.listen(chat_id=chat_id, user_id=user_id, timeout=45)
@@ -191,9 +199,9 @@ async def add_handler_query(client: "Bot", callback_query: "CallbackQuery") -> N
 
     try:
         chat = await client.get_chat(new_id)
-        if (callback_query_data == "admin" and chat.type != ChatType.PRIVATE) or (
-            callback_query_data == "fsub"
-            and chat.type not in [ChatType.SUPERGROUP, ChatType.CHANNEL]
+        if (callback_query_data == "admin" and chat.type != ChatType.PRIVATE) or \
+            (callback_query_data == "fsub" and chat.type not in [ChatType.SUPERGROUP, ChatType.CHANNEL]) or \
+            (channel_mode and chat.type != ChatType.CHANNEL
         ):
             raise Exception
     except Exception:
@@ -206,6 +214,8 @@ async def add_handler_query(client: "Bot", callback_query: "CallbackQuery") -> N
     if callback_query_data == "admin":
         await add_admin(new_id)
         await cache.admins_init()
+    elif channel_mode:
+        config.DATABASE_CHAT_ID = new_id
     else:
         await add_fs_chat(new_id)
         await cache.fs_chats_init()

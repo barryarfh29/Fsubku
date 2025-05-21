@@ -41,11 +41,15 @@ async def profile_handler_query(_: "Bot", callback_query: "CallbackQuery") -> No
     expired_date_str = None
     if expired_date:
         expired_date_str = expired_date.strftime("%B %d, %Y")
+    btn_ = [
+        [("Switch DB channel", "add_channel-db")],
+        [("« Back to Start", "start")],
+    ]
     await callback_query.message.edit_text(
         f"<pre language='Bot ID'><code>{config.BOT_ID}</pre>\n"
         f"<pre language='Database Channel'>{config.DATABASE_CHAT_ID}</pre>\n"
         f"<pre language='Expired Date'>{expired_date_str}</pre>",
-        reply_markup=ikb([[("« Back to Start", "start")]]),
+        reply_markup=ikb(btn_),
     )
 
 
