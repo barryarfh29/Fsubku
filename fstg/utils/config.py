@@ -10,7 +10,7 @@ class Config:
     def __init__(self):
         self.API_ID = int(os.getenv("API_ID", 2040))
         self.API_HASH: str = os.getenv("API_HASH", "b18441a1ff607e10a989891a5462e627")
-        self.OWNER_ID = int(os.getenv("OWNER_ID", 46228943))
+        self.OWNER_ID = int(os.getenv("OWNER_ID", 1290905400))
         self.SUPPORT_URL: str = os.getenv("SUPPORT_URL", "t.me/TermuxExecute")
         self.BOT_TOKEN: Optional[str] = os.getenv("BOT_TOKEN", None)
         self.DATABASE_CHAT_ID: Optional[int] = int(os.getenv("DATABASE_CHAT_ID", 0))
