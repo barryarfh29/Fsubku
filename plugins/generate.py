@@ -51,7 +51,7 @@ async def generate_handler(client: "Bot", message: "Message") -> None:
     )
 
 
-@Client.on_message(filters.chat(config.DATABASE_CHAT_ID))
+@Client.on_message(filters.create(lambda _, __, msgs: msgs.chat.id == config.DATABASE_CHAT_ID))
 async def _generate_handler(client: "Bot", message: "Message") -> None:
     encoded_data = url_safe.encode_data(
         f"id-{message.id * abs(config.DATABASE_CHAT_ID)}"
